@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const ApiResponse = require('claudia-api-builder').ApiResponse;
 
 module.exports = Interceptor;
 
@@ -25,7 +26,44 @@ function Interceptor() {
     throw new Error('Only functions or a single array of functions can be passed as a parameter to this function');
   }
 
-  return async (request) => this.interceptors.reduce(
-    async (prev, curr) => Promise.resolve(curr(await prev)), Promise.resolve(request)
-  );
+  return async (request) => {
+    let errorEncoutered = false;
+    let apiResponse = false;
+    let falsy = false;
+
+    return this.interceptors.reduce(
+      async (prev, curr) => {
+        if (errorEncoutered) {
+          return Promise.reject(await prev);
+        } else if (apiResponse || falsy) {
+          return Promise.resolve(await prev);
+        } else {
+          // if ApiResponse return this
+          const previous = await prev;
+          if (previous instanceof ApiResponse) {
+            apiResponse = true;
+            return Promise.resolve(previous);
+          }
+
+          // If falsy don't error out but return
+          // falsy value
+          if (!previous) {
+            falsy = true;
+            return Promise.resolve(previous);
+          }
+
+          // If no error, not falsy and not ApiResponse
+          // then process next function
+          let res;
+          try {
+            res = curr(previous);
+          } catch (e) {
+            errorEncoutered = true;
+            return Promise.reject(e);
+          }
+          return Promise.resolve(res)
+        }
+      }, Promise.resolve(request)
+    );
+  }
 }

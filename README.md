@@ -54,3 +54,7 @@ const isItATear = (request) => ({
 });
 api.intercept(new Interceptor([addFirstName, addLastName, isItATear]));
 ```
+
+## Exiting The Pipeline Early (ApiResponse, Error or Falsy values)
+
+If an ApiResponse, Falsy value, or Error is returned from one of the interceptors present within the queue of functions to run, any later functions won't be executed and the final output / response from the interceptor will be the ApiResponse, Error or falsy value that is encountered.

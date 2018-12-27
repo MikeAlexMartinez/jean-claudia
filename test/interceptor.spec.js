@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+const ApiResponse = require('claudia-api-builder').ApiResponse;
 const Interceptor = require('../interceptor');
 
 describe('Interceptor - Interceptor()', function() {
@@ -226,5 +227,65 @@ describe('Interceptor - Interceptor()', function() {
       const result = await interceptor(start);
       expect(result).to.equal(end);
     });
-  })
+  });
+
+  describe('should error return error if mid-queue functions causes error', () => {
+    it('should return first error', async () => {
+      const start = {};
+      const addFirstName = async (r) => ({ firstName: 'firstname' });
+      const errorFn = async (r) => {
+        throw new Error('this is an error');
+      };
+      const errorFnTwo = async (r) => {
+        throw new Error('this is the second error');
+      };
+      const addLastName = async (r) => ({...r, lastName: 'lastname'});
+      const interceptor = new Interceptor(addFirstName, errorFn, errorFnTwo, addLastName);
+      let error;
+
+      try {
+        await interceptor(start);
+      } catch (e) {
+        error = e;
+      }
+      expect(error).to.be.an('error');
+      expect(error.message).to.equal('this is an error');
+    });
+  });
+
+  describe('Handles ApiResponse', () => {
+    it('should return ApiResponse if encountered', async () => {
+      const apiResponse = new ApiResponse({testing: 'apiresponse'}, {}, 200);
+      const start = {};
+      const addFirstName = async (r) => ({ firstName: 'firstname' });
+      const returnApiResponse = async (r) => {
+        return apiResponse;
+      };
+      const errorFnTwo = async (r) => {
+        throw new Error('this is the second error');
+      };
+      const addLastName = async (r) => ({...r, lastName: 'lastname'});
+      const interceptor = new Interceptor(addFirstName, returnApiResponse, errorFnTwo, addLastName);
+      let response = await interceptor(start);
+
+      expect(response).to.deep.equal(apiResponse);
+    });
+  });
+
+  describe('Handles falsy values', () => {
+    it('should return falsy value if encountered', async () => {
+      const start = {};
+      const addFirstName = async (r) => ({ firstName: 'firstname' });
+      const returnFalsy = async (r) => '';
+      const errorFnTwo = async (r) => {
+        throw new Error('this is the second error');
+      };
+      const addLastName = async (r) => ({...r, lastName: 'lastname'});
+      const interceptor = new Interceptor(addFirstName, returnFalsy, errorFnTwo, addLastName);
+      let response = await interceptor(start);
+  
+      expect(response).to.be.not.ok;
+      expect(response).to.equal('');
+    });
+  });
 });

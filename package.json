@@ -27,6 +27,7 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
+    "claudia-api-builder": "^4.1.1",
     "lodash": "^4.17.11"
   }
 }
