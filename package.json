@@ -1,6 +1,6 @@
 {
   "name": "jean-claudia",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Provides a function to create middleware like pathway of functions to run before the endpoint function is run.",
   "main": "interceptor.js",
   "scripts": {
