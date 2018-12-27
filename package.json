@@ -1,0 +1,32 @@
+{
+  "name": "jean-claudia",
+  "version": "0.1.0",
+  "description": "Provides a function to create middleware like pathway of functions to run before the endpoint function is run.",
+  "main": "interceptor.js",
+  "scripts": {
+    "test": "mocha \"test/**/*.spec.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikeAlexMartinez/jean-claudia.git"
+  },
+  "keywords": [
+    "claudiajs",
+    "claudia-api-builder",
+    "nodejs",
+    "aws"
+  ],
+  "author": "Michael A. Martinez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MikeAlexMartinez/jean-claudia/issues"
+  },
+  "homepage": "https://github.com/MikeAlexMartinez/jean-claudia#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
+}
